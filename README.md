@@ -27,7 +27,7 @@ sudo make install
 
 ```
 sudo modprobe vswap
-sudo tools/vswap attach 12G
+sudo vswap attach 12G
 sudo mkswap /dev/vswap0
 sudo swapon -p 100 /dev/vswap0
 ```
@@ -38,7 +38,7 @@ sudo swapon -p 100 /dev/vswap0
 
 ```
 sudo swapoff /dev/vswap0
-sudo tools/vswap release
+sudo vswap release
 sudo rmmod vswap
 ```
 
