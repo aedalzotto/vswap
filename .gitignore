@@ -1,0 +1,14 @@
+*.o
+*.ko
+*.ko.*
+*.mod
+*.mod.c
+.*.cmd
+.module-common.o
+Module.symvers
+modules.order
+.tmp_versions/
+/tools/vswap
+/tests/vram-read-bench
+/docs/history/
+/tests/logs/

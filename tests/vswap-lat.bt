@@ -1,0 +1,34 @@
+#!/usr/bin/env bpftrace
+// Time each swap I/O spends inside vswap, by direction and size.
+// sudo tests/vswap-lat.bt, then Ctrl+C to print the histograms.
+// Costs nothing when not running: it attaches to vswap_submit_bio through the module's BTF.
+
+fentry:vswap:vswap_submit_bio
+{
+	@start[tid] = nsecs;
+	@op[tid] = args.bio->bi_opf & 0xff;	// REQ_OP_READ 0, REQ_OP_WRITE 1
+	@len[tid] = args.bio->bi_iter.bi_size;
+}
+
+fexit:vswap:vswap_submit_bio
+/@start[tid]/
+{
+	$us = (nsecs - @start[tid]) / 1000;
+	if (@op[tid] == 0) {
+		@read_us = hist($us);
+		@read_kib = hist(@len[tid] / 1024);
+	} else if (@op[tid] == 1) {
+		@write_us = hist($us);
+		@write_kib = hist(@len[tid] / 1024);
+	}
+	delete(@start[tid]);
+	delete(@op[tid]);
+	delete(@len[tid]);
+}
+
+END
+{
+	clear(@start);
+	clear(@op);
+	clear(@len);
+}
