@@ -11,10 +11,10 @@ struct vswap_attach {
 	__u64 addr;	/* caller's MAP_SHARED mmap of the whole dma-buf, at offset 0 */
 };
 
-/** 
- * Appends one dma-buf to /dev/vswap0, in call order. 
- * The module keeps its own reference and reads the page frames out of the 
- * caller's mapping, so the caller may unmap, close and exit afterwards. 
+/**
+ * Appends one dma-buf to /dev/vswap0, in call order.
+ * The module keeps its own reference and reads the page frames out of the
+ * caller's mapping, so the caller may unmap, close and exit afterwards.
  */
 #define VSWAP_ATTACH  _IOW('k', 1, struct vswap_attach)
 

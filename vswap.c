@@ -91,15 +91,15 @@ static int vswap_copy_seg(struct bio_vec *bv, sector_t sector, bool write)
 static void vswap_submit_bio(struct bio *bio)
 {
 	switch (bio_op(bio)) {
-		case REQ_OP_READ:
-		case REQ_OP_WRITE:
-			break;
-		case REQ_OP_DISCARD:	/* nothing to free: the VRAM stays ours */
-			bio_endio(bio);
-			return;
-		default:
-			bio_io_error(bio);
-			return;
+	case REQ_OP_READ:
+	case REQ_OP_WRITE:
+		break;
+	case REQ_OP_DISCARD:	/* nothing to free: the VRAM stays ours */
+		bio_endio(bio);
+		return;
+	default:
+		bio_io_error(bio);
+		return;
 	}
 
 	bool write = op_is_write(bio_op(bio));
@@ -174,7 +174,7 @@ static void __iomem *vswap_map_user_frames(struct dma_buf *buf, unsigned long ad
 	/* Look up the VMA */
 	struct vm_area_struct *vma = vma_lookup(mm, addr);
 	if (
-		   (vma == NULL) 
+		   (vma == NULL)
 		|| (vma->vm_file != buf->file) 		/* not an mmap of this dma-buf */
 		|| (vma->vm_start != addr)	   		/* does not start at the buffer's start */
 		|| (vma->vm_end - addr < buf->size) /* does not cover the whole buffer */
@@ -186,9 +186,9 @@ static void __iomem *vswap_map_user_frames(struct dma_buf *buf, unsigned long ad
 
 	/* For each page in the buffer */
 	for (unsigned int i = 0; i < n; i++) {
-		struct follow_pfnmap_args args = { 
-			.vma = vma, 
-			.address = addr + ((unsigned long)i << PAGE_SHIFT) 
+		struct follow_pfnmap_args args = {
+			.vma = vma,
+			.address = addr + ((unsigned long)i << PAGE_SHIFT)
 		};
 
 		/* Try to follow the PFN map */
@@ -329,20 +329,20 @@ static long vswap_ioctl(struct file *f, unsigned int cmd, unsigned long arg)
 	struct vswap_attach a;
 
 	switch (cmd) {
-		case VSWAP_ATTACH:
-			if (copy_from_user(&a, (void __user *)arg, sizeof(a)))
-				return -EFAULT;
-			mutex_lock(&ctl_lock);
-			err = vswap_attach(&a);
-			mutex_unlock(&ctl_lock);
-			return err;
-		case VSWAP_RELEASE:
-			mutex_lock(&ctl_lock);
-			err = vswap_release();
-			mutex_unlock(&ctl_lock);
-			return err;
-		default:
-			break;
+	case VSWAP_ATTACH:
+		if (copy_from_user(&a, (void __user *)arg, sizeof(a)))
+			return -EFAULT;
+		mutex_lock(&ctl_lock);
+		err = vswap_attach(&a);
+		mutex_unlock(&ctl_lock);
+		return err;
+	case VSWAP_RELEASE:
+		mutex_lock(&ctl_lock);
+		err = vswap_release();
+		mutex_unlock(&ctl_lock);
+		return err;
+	default:
+		break;
 	}
 	return -ENOTTY;
 }
@@ -367,7 +367,7 @@ static int __init vswap_init(void)
 {
 	sema_init(&readers, max(max_readers, 1u));
 
-	int err = register_pm_notifier(&pm_nb);	
+	int err = register_pm_notifier(&pm_nb);
 
 	if (err)
 		return err;

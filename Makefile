@@ -4,6 +4,7 @@ ifeq ($(KERNELRELEASE),)
 KVER ?= $(shell uname -r)
 KDIR ?= /lib/modules/$(KVER)/build
 PREFIX ?= /usr/local
+CHECKPATCH_IGNORE ?=
 
 all: module tool
 module:
@@ -19,8 +20,12 @@ uninstall:
 	depmod -a $(if $(INSTALL_MOD_PATH),-b $(INSTALL_MOD_PATH)) $(KVER)
 	rm -f $(DESTDIR)$(PREFIX)/bin/vswap
 
+# Kernel coding-style check of the module sources; skip rules with CHECKPATCH_IGNORE=RULE1,RULE2
+checkpatch:
+	$(KDIR)/scripts/checkpatch.pl --no-tree -f --show-types $(if $(CHECKPATCH_IGNORE),--ignore $(CHECKPATCH_IGNORE)) vswap.c vswap_uapi.h
+
 clean:
 	$(MAKE) -C $(KDIR) M=$(CURDIR) clean
 	rm -f tools/vswap
-.PHONY: all module tool install uninstall clean
+.PHONY: all module tool install uninstall checkpatch clean
 endif
